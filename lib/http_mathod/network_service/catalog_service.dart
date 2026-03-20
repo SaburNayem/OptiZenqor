@@ -7,28 +7,58 @@ class CatalogService {
   List<CategoryModel> getCategories() {
     return const <CategoryModel>[
       CategoryModel(
-        id: 'fashion',
-        name: 'Fashion',
-        icon: 'checkroom',
-        bannerTitle: 'Street style, elevated',
-      ),
-      CategoryModel(
-        id: 'electronics',
-        name: 'Electronics',
-        icon: 'devices',
-        bannerTitle: 'Daily tech essentials',
-      ),
-      CategoryModel(
-        id: 'beauty',
-        name: 'Beauty',
+        id: 'beauty_personal_care',
+        name: 'Beauty & Personal Care',
         icon: 'spa',
-        bannerTitle: 'Skincare picks that travel well',
+        bannerTitle: 'Beauty & Personal Care',
       ),
       CategoryModel(
-        id: 'home',
-        name: 'Home',
+        id: 'books_stationary',
+        name: 'Books & Stationary',
+        icon: 'menu_book',
+        bannerTitle: 'Books & Stationary',
+      ),
+      CategoryModel(
+        id: 'electronics_gadget',
+        name: 'Electronics & Gadget',
+        icon: 'devices',
+        bannerTitle: 'Electronics & Gadget',
+      ),
+      CategoryModel(
+        id: 'fashion_clothing',
+        name: 'Fashion & Clothing',
+        icon: 'checkroom',
+        bannerTitle: 'Fashion & Clothing',
+      ),
+      CategoryModel(
+        id: 'groceries_food',
+        name: 'Groceries & Food',
+        icon: 'fastfood',
+        bannerTitle: 'Groceries & Food',
+      ),
+      CategoryModel(
+        id: 'health_wellness',
+        name: 'Health & Wealth',
+        icon: 'health_and_safety',
+        bannerTitle: 'Health & Wellness',
+      ),
+      CategoryModel(
+        id: 'home_living',
+        name: 'Home & Living',
         icon: 'chair_alt',
-        bannerTitle: 'Warm home upgrades',
+        bannerTitle: 'Home & Living',
+      ),
+      CategoryModel(
+        id: 'sports_outdoor',
+        name: 'Sports & Outdoor',
+        icon: 'sports_basketball',
+        bannerTitle: 'Sports & Outdoor',
+      ),
+      CategoryModel(
+        id: 'toy_babies_product',
+        name: 'Toy & Babies',
+        icon: 'toys',
+        bannerTitle: 'Toy & Babies Product',
       ),
     ];
   }
@@ -37,86 +67,161 @@ class CatalogService {
     return const <ProductModel>[
       ProductModel(
         id: 'p1',
-        name: 'Aero Knit Jacket',
-        categoryId: 'fashion',
-        categoryName: 'Fashion',
-        price: 86,
-        rating: 4.8,
+        name: 'Product 1',
+        categoryId: 'featured',
+        categoryName: 'Featured',
+        price: 20,
+        rating: 4.5,
         imageUrl:
-            'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80',
-        description:
-            'Lightweight layering piece for daily city wear with a tailored finish.',
+            'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=900&q=80',
+        description: 'Featured product from the Shob Bazaar shop section.',
       ),
       ProductModel(
         id: 'p2',
-        name: 'Urban Noise Headphones',
-        categoryId: 'electronics',
-        categoryName: 'Electronics',
-        price: 149,
-        rating: 4.7,
+        name: 'Product 2',
+        categoryId: 'featured',
+        categoryName: 'Featured',
+        price: 25,
+        rating: 4.5,
         imageUrl:
             'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80',
-        description:
-            'Balanced sound, soft ear cushions, and long battery life for all-day use.',
+        description: 'Featured product from the Shob Bazaar shop section.',
       ),
       ProductModel(
         id: 'p3',
-        name: 'Glow Ritual Set',
-        categoryId: 'beauty',
-        categoryName: 'Beauty',
-        price: 42,
-        rating: 4.6,
+        name: 'Product 3',
+        categoryId: 'featured',
+        categoryName: 'Featured',
+        price: 30,
+        rating: 4.5,
         imageUrl:
-            'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=80',
-        description:
-            'Clean skincare trio focused on hydration, repair, and a healthy finish.',
+            'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=900&q=80',
+        description: 'Featured product from the Shob Bazaar shop section.',
       ),
       ProductModel(
         id: 'p4',
-        name: 'Nordic Accent Chair',
-        categoryId: 'home',
-        categoryName: 'Home',
-        price: 210,
-        rating: 4.9,
+        name: 'Face Cleanser',
+        categoryId: 'beauty_personal_care',
+        categoryName: 'Beauty & Personal Care',
+        price: 15,
+        rating: 4.5,
         imageUrl:
-            'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
+            'https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=900&q=80',
         description:
-            'Minimal lounge chair with soft texture and strong statement silhouette.',
+            'Category product reused across multiple category pages in the repo.',
       ),
       ProductModel(
         id: 'p5',
-        name: 'Transit Sneaker',
-        categoryId: 'fashion',
-        categoryName: 'Fashion',
-        price: 74,
+        name: 'Shampoo',
+        categoryId: 'beauty_personal_care',
+        categoryName: 'Beauty & Personal Care',
+        price: 20,
         rating: 4.5,
         imageUrl:
-            'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
+            'https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=900&q=80',
         description:
-            'Everyday sneaker designed for comfort, movement, and a clean wardrobe fit.',
+            'Category product reused across multiple category pages in the repo.',
       ),
       ProductModel(
         id: 'p6',
-        name: 'Studio Lamp',
-        categoryId: 'home',
-        categoryName: 'Home',
-        price: 68,
+        name: 'Lipstick',
+        categoryId: 'beauty_personal_care',
+        categoryName: 'Beauty & Personal Care',
+        price: 10,
         rating: 4.4,
         imageUrl:
-            'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80',
+            'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=900&q=80',
         description:
-            'Compact table lamp with warm light and sculpted matte finish.',
+            'Category product reused across multiple category pages in the repo.',
+      ),
+      ProductModel(
+        id: 'p7',
+        name: 'Perfume',
+        categoryId: 'beauty_personal_care',
+        categoryName: 'Beauty & Personal Care',
+        price: 35,
+        rating: 4.4,
+        imageUrl:
+            'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=900&q=80',
+        description:
+            'Category product reused across multiple category pages in the repo.',
       ),
     ];
   }
 
   List<ProductModel> getFeaturedProducts() {
-    return getProducts().take(4).toList();
+    return getProducts().take(3).toList();
   }
 
   List<ProductModel> getProductsByCategory(String categoryId) {
-    return getProducts()
-        .where((ProductModel product) => product.categoryId == categoryId)
-        .toList();
+    if (categoryId == 'featured') {
+      return getFeaturedProducts();
+    }
+
+    CategoryModel? category;
+    for (final CategoryModel item in getCategories()) {
+      if (item.id == categoryId) {
+        category = item;
+        break;
+      }
+    }
+
+    return const <ProductModel>[
+      ProductModel(
+        id: 'cp1',
+        name: 'Face Cleanser',
+        categoryId: 'category',
+        categoryName: 'Category',
+        price: 15,
+        rating: 4.5,
+        imageUrl:
+            'https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=900&q=80',
+        description: 'Category product from the original repo.',
+      ),
+      ProductModel(
+        id: 'cp2',
+        name: 'Shampoo',
+        categoryId: 'category',
+        categoryName: 'Category',
+        price: 20,
+        rating: 4.5,
+        imageUrl:
+            'https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=900&q=80',
+        description: 'Category product from the original repo.',
+      ),
+      ProductModel(
+        id: 'cp3',
+        name: 'Lipstick',
+        categoryId: 'category',
+        categoryName: 'Category',
+        price: 10,
+        rating: 4.5,
+        imageUrl:
+            'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=900&q=80',
+        description: 'Category product from the original repo.',
+      ),
+      ProductModel(
+        id: 'cp4',
+        name: 'Perfume',
+        categoryId: 'category',
+        categoryName: 'Category',
+        price: 35,
+        rating: 4.5,
+        imageUrl:
+            'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=900&q=80',
+        description: 'Category product from the original repo.',
+      ),
+    ].map((ProductModel product) {
+      return ProductModel(
+        id: '${categoryId}_${product.id}',
+        name: product.name,
+        categoryId: categoryId,
+        categoryName: category?.bannerTitle ?? 'Category',
+        price: product.price,
+        rating: product.rating,
+        imageUrl: product.imageUrl,
+        description: product.description,
+      );
+    }).toList();
   }
 }

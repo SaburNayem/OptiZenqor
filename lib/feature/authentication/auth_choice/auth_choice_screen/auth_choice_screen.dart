@@ -17,7 +17,7 @@ class AuthChoiceScreen extends StatelessWidget {
       body: DecoratedBox(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: <Color>[Color(0xFFF8E8D8), Color(0xFFF7F4EF), Colors.white],
+            colors: <Color>[Color(0xFFE7FFFF), Colors.white, Colors.white],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -58,10 +58,13 @@ class AuthChoiceScreen extends StatelessWidget {
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('Fresh drops every week', style: AppTextStyle.title),
+                      Text(
+                        'Buy Smartly Buy Genuine',
+                        style: AppTextStyle.title,
+                      ),
                       SizedBox(height: 8),
                       Text(
-                        'Browse curated categories, deals, favorites, and your cart from one main commerce shell.',
+                        'The original repo moves from splash to register or login, then into the shop app.',
                         style: AppTextStyle.body,
                       ),
                     ],
@@ -76,7 +79,7 @@ class AuthChoiceScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 AppButton(
-                  title: 'Create Account',
+                  title: 'SIgn Up',
                   isOutlined: true,
                   onPressed: () {
                     Navigator.pushNamed(context, AppRoute.signUp);

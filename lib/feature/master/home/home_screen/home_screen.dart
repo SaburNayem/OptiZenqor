@@ -5,7 +5,6 @@ import 'package:optizenqor/core/constant/text_style.dart';
 import 'package:optizenqor/core/widget/card_widget.dart';
 import 'package:optizenqor/feature/master/drawer/drawer_screen/drawer_screen.dart';
 import 'package:optizenqor/feature/master/home/home_controller/home_controller.dart';
-import 'package:optizenqor/feature/master/product_details/product_details_model/category_model.dart';
 import 'package:optizenqor/feature/master/product_details/product_details_model/product_model.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -107,10 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildBannerCarousel(banners),
             const SizedBox(height: 12),
             _buildBannerIndicator(banners.length),
-            const SizedBox(height: 24),
-            _buildCategoryHeader(context),
-            const SizedBox(height: 10),
-            _buildCategoryScroller(data.categories, context),
             const SizedBox(height: 24),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
@@ -253,83 +248,15 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  Widget _buildCategoryHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          const Text('Categories', style: AppTextStyle.heading),
-          TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoute.categories);
-            },
-            child: const Text('See all'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryScroller(
-    List<CategoryModel> categories,
-    BuildContext context,
-  ) {
-    return SizedBox(
-      height: 116,
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return const SizedBox(width: 12);
-        },
-        itemBuilder: (BuildContext context, int index) {
-          final CategoryModel category = categories[index];
-          return InkWell(
-            onTap: () {
-              Navigator.pushNamed(context, AppRoute.categories);
-            },
-            borderRadius: BorderRadius.circular(18),
-            child: Container(
-              width: 150,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppColor.border),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  const Icon(Icons.arrow_outward, color: AppColor.accent),
-                  Text(category.name, style: AppTextStyle.title),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
 }
 
 class HomeModelData {
-  const HomeModelData({
-    required this.categories,
-    required this.featuredProducts,
-  });
+  const HomeModelData({required this.featuredProducts});
 
-  final List<CategoryModel> categories;
   final List<ProductModel> featuredProducts;
 
   factory HomeModelData.fromController(HomeController controller) {
     final data = controller.dashboardData;
-    return HomeModelData(
-      categories: data.categories,
-      featuredProducts: data.featuredProducts,
-    );
+    return HomeModelData(featuredProducts: data.featuredProducts);
   }
 }

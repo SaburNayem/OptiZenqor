@@ -67,10 +67,10 @@ class MasterDrawerScreen extends StatelessWidget {
                       return;
                     }
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('$item page is ready to add next'),
-                      ),
+                    Navigator.pushNamed(
+                      context,
+                      AppRoute.drawerPage,
+                      arguments: item,
                     );
                   },
                 );
