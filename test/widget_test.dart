@@ -1,19 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:optizenqor/main.dart';
+import 'package:optizenqor/app.dart';
 
 void main() {
-  testWidgets('renders OptiZenqor dashboard content', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const OptiZenqorApp());
+  testWidgets('renders splash then home screen', (WidgetTester tester) async {
+    await tester.pumpWidget(const OptiZenqor());
 
     expect(find.text('OptiZenqor'), findsOneWidget);
-    expect(
-      find.textContaining('keeps your goals, habits, and focus sessions'),
-      findsOneWidget,
-    );
-    expect(find.text('Today\'s focus map'), findsOneWidget);
-    expect(find.text('Habit consistency'), findsOneWidget);
-    expect(find.text('Daily rhythm'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Welcome to OptiZenqor'), findsOneWidget);
+    expect(find.text('Today Plan'), findsOneWidget);
+    expect(find.text('Habit Track'), findsOneWidget);
+    expect(find.text('Energy Check'), findsOneWidget);
   });
 }
