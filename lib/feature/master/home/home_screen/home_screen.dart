@@ -107,13 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColor.background,
-      drawer: const MasterDrawerScreen(),
+      endDrawer: const MasterDrawerScreen(),
       appBar: AppBar(
         backgroundColor: AppColor.primary,
         foregroundColor: Colors.white,
-        leadingWidth: _isSearchExpanded ? 0 : null,
-        automaticallyImplyLeading: !_isSearchExpanded,
-        leading: _isSearchExpanded ? const SizedBox.shrink() : null,
+        automaticallyImplyLeading: false,
         titleSpacing: _isSearchExpanded ? 12 : 0,
         title: _isSearchExpanded
             ? Container(
@@ -168,6 +166,17 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(
               onPressed: () {},
               icon: const Icon(Icons.notifications_none_rounded),
+            ),
+          if (!_isSearchExpanded)
+            Builder(
+              builder: (BuildContext context) {
+                return IconButton(
+                  onPressed: () {
+                    Scaffold.of(context).openEndDrawer();
+                  },
+                  icon: const Icon(Icons.menu_rounded),
+                );
+              },
             ),
         ],
       ),
