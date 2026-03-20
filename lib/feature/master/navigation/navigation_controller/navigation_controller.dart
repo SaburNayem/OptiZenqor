@@ -17,11 +17,11 @@ class NavigationController {
     NavigationItemModel(label: 'Account', icon: Icons.person_rounded),
   ];
 
-  List<Widget> get pages => const <Widget>[
-    HomeScreen(),
-    ShopScreen(),
-    FavoriteScreen(),
-    CartScreen(),
-    AccountScreen(),
+  List<Widget> pages({String? initialShopQuery}) => <Widget>[
+    const HomeScreen(),
+    ShopScreen(initialQuery: initialShopQuery),
+    const FavoriteScreen(),
+    const CartScreen(),
+    const AccountScreen(),
   ];
 }

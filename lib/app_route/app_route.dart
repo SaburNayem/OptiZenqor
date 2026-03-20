@@ -35,11 +35,23 @@ class AppRoute {
       case signUp:
         return _buildRoute(const SignUpScreen(), settings);
       case mainShell:
-        final int initialIndex = settings.arguments is int
-            ? settings.arguments! as int
-            : 0;
+        int initialIndex = 0;
+        String? initialQuery;
+
+        if (settings.arguments is int) {
+          initialIndex = settings.arguments! as int;
+        } else if (settings.arguments is Map<String, dynamic>) {
+          final Map<String, dynamic> args =
+              settings.arguments! as Map<String, dynamic>;
+          initialIndex = args['initialIndex'] as int? ?? 0;
+          initialQuery = args['searchQuery'] as String?;
+        }
+
         return _buildRoute(
-          NavigationScreen(initialIndex: initialIndex),
+          NavigationScreen(
+            initialIndex: initialIndex,
+            initialShopQuery: initialQuery,
+          ),
           settings,
         );
       case categories:
