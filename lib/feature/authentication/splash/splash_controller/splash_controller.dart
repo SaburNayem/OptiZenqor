@@ -6,8 +6,8 @@ class SplashController {
   const SplashController();
 
   SplashModel get content => const SplashModel(
-    title: 'OmniZara',
-    subtitle: 'Curated shopping for fashion, home, beauty, and more.',
+    title: 'Shob Bazaar',
+    subtitle: 'Buy Smartly Buy Genuine',
   );
 
   Future<void> navigateNext(BuildContext context) async {

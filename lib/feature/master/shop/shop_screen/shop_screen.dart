@@ -4,6 +4,7 @@ import 'package:optizenqor/core/constant/app_color.dart';
 import 'package:optizenqor/core/constant/text_style.dart';
 import 'package:optizenqor/core/widget/card_widget.dart';
 import 'package:optizenqor/core/widget/custom_appbar.dart';
+import 'package:optizenqor/feature/master/drawer/drawer_screen/drawer_screen.dart';
 import 'package:optizenqor/feature/master/product_details/product_details_model/product_model.dart';
 import 'package:optizenqor/feature/master/shop/shop_controller/shop_controller.dart';
 
@@ -42,6 +43,7 @@ class _ShopScreenState extends State<ShopScreen> {
     final data = _controller.data;
 
     return Scaffold(
+      drawer: const MasterDrawerScreen(),
       appBar: const AppCustomAppBar(title: 'Shop'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

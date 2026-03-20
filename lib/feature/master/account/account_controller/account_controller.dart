@@ -4,14 +4,14 @@ class AccountController {
   const AccountController();
 
   AccountModel get data => const AccountModel(
-    name: 'Nayem Sabur',
-    email: 'nayem@example.com',
+    name: 'Shob Bazaar',
+    email: 'support@yourapp.com',
     actions: <String>[
-      'My Orders',
-      'Delivery Address',
-      'Payment Method',
+      'Personal Details',
       'Settings',
-      'Support',
+      'Payment Method',
+      'Delivery Address',
+      'My Order',
     ],
   );
 }

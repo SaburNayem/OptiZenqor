@@ -9,9 +9,8 @@ class SignUpController {
   final AuthService _authService;
 
   SignUpModel get content => const SignUpModel(
-    title: 'Create your account',
-    subtitle:
-        'Set up your OmniZara profile and start browsing curated products.',
+    title: 'Welcome To SignUp Screen',
+    subtitle: 'Create your account using the original repo fields.',
   );
 
   Future<ServiceModel<Map<String, dynamic>>> signUp({

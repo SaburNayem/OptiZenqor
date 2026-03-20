@@ -9,8 +9,8 @@ class SignInController {
   final AuthService _authService;
 
   SignInModel get content => const SignInModel(
-    title: 'Welcome back',
-    subtitle: 'Sign in to continue shopping your saved picks and cart.',
+    title: 'Welcome To SignIn Screen',
+    subtitle: 'Enter your email and password to continue.',
   );
 
   Future<ServiceModel<Map<String, dynamic>>> signIn({

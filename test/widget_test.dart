@@ -7,13 +7,13 @@ void main() {
   ) async {
     await tester.pumpWidget(const OptiZenqor());
 
-    expect(find.text('OmniZara'), findsOneWidget);
+    expect(find.text('Shob Bazaar'), findsOneWidget);
 
     await tester.pump(const Duration(seconds: 2));
     await tester.pumpAndSettle();
 
-    expect(find.text('Shop smarter, every day'), findsOneWidget);
+    expect(find.text('Welcome To Shob Bazaar'), findsOneWidget);
     expect(find.text('Log In'), findsOneWidget);
-    expect(find.text('Create Account'), findsOneWidget);
+    expect(find.text('SIgn Up'), findsOneWidget);
   });
 }

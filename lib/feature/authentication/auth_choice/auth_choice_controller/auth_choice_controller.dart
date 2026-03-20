@@ -4,8 +4,7 @@ class AuthChoiceController {
   const AuthChoiceController();
 
   AuthChoiceModel get content => const AuthChoiceModel(
-    title: 'Shop smarter, every day',
-    subtitle:
-        'Explore fashion, home, beauty, and electronics with a clean OmniZara-style commerce flow.',
+    title: 'Welcome To Shob Bazaar',
+    subtitle: 'Log In or SIgn Up to continue.',
   );
 }

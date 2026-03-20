@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:optizenqor/app_route/app_route.dart';
 import 'package:optizenqor/core/constant/app_color.dart';
 import 'package:optizenqor/feature/master/categories/categories_controller/categories_controller.dart';
+import 'package:optizenqor/http_mathod/network_service/catalog_service.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
@@ -8,6 +10,7 @@ class CategoriesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = const CategoriesController().data;
+    final categories = const CatalogService().getCategories();
 
     return Scaffold(
       appBar: AppBar(
@@ -39,8 +42,10 @@ class CategoriesScreen extends StatelessWidget {
                   size: 18,
                 ),
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('$item page is ready to add next')),
+                  Navigator.pushNamed(
+                    context,
+                    AppRoute.categoryDetails,
+                    arguments: categories[index],
                   );
                 },
               ),
