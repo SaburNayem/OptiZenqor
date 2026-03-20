@@ -3,6 +3,7 @@ import 'package:optizenqor/app_route/app_route.dart';
 import 'package:optizenqor/core/constant/app_color.dart';
 import 'package:optizenqor/core/constant/text_style.dart';
 import 'package:optizenqor/core/widget/card_widget.dart';
+import 'package:optizenqor/feature/master/drawer/drawer_screen/drawer_screen.dart';
 import 'package:optizenqor/feature/master/home/home_controller/home_controller.dart';
 import 'package:optizenqor/feature/master/product_details/product_details_model/category_model.dart';
 import 'package:optizenqor/feature/master/product_details/product_details_model/product_model.dart';
@@ -64,10 +65,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColor.background,
+      drawer: const MasterDrawerScreen(),
       appBar: AppBar(
         backgroundColor: AppColor.primary,
         foregroundColor: Colors.white,
-        leading: IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
         titleSpacing: 0,
         title: Container(
           height: 42,
