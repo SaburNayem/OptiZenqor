@@ -33,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   List<String> _suggestions = <String>[];
+  List<ProductModel> _searchedProducts = <ProductModel>[];
   int _currentBanner = 0;
   bool _isSearchExpanded = false;
 
@@ -57,12 +58,30 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _performSearch(List<ProductModel> products) {
+    final String query = _searchController.text.trim().toLowerCase();
+
+    setState(() {
+      if (query.isEmpty) {
+        _searchedProducts = <ProductModel>[];
+        return;
+      }
+
+      _searchedProducts = products.where((ProductModel product) {
+        return product.name.toLowerCase().contains(query) ||
+            product.categoryName.toLowerCase().contains(query) ||
+            product.description.toLowerCase().contains(query);
+      }).toList();
+    });
+  }
+
   void _toggleSearch() {
     setState(() {
       _isSearchExpanded = !_isSearchExpanded;
       if (!_isSearchExpanded) {
         _searchController.clear();
         _suggestions = <String>[];
+        _searchedProducts = <ProductModel>[];
         _searchFocusNode.unfocus();
       }
     });
@@ -80,6 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final HomeModelData data = HomeModelData.fromController(_controller);
     final List<ProductModel> banners = data.topProducts.take(3).toList();
+    final List<ProductModel> searchableProducts = data.searchableProducts;
 
     return Scaffold(
       backgroundColor: AppColor.background,
@@ -87,27 +107,32 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: AppColor.primary,
         foregroundColor: Colors.white,
-        titleSpacing: 0,
+        automaticallyImplyLeading: !_isSearchExpanded,
+        leading: _isSearchExpanded ? null : null,
+        titleSpacing: _isSearchExpanded ? 16 : 0,
         title: AnimatedSwitcher(
           duration: const Duration(milliseconds: 220),
           child: _isSearchExpanded
               ? Container(
                   key: const ValueKey<String>('search_field'),
                   height: 42,
-                  margin: const EdgeInsets.only(right: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(999),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: TextField(
                     controller: _searchController,
                     focusNode: _searchFocusNode,
                     onChanged: _onSearchChanged,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
+                    onSubmitted: (_) => _performSearch(searchableProducts),
+                    style: const TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
                       hintText: 'Search products',
-                      hintStyle: TextStyle(color: Colors.white70),
-                      prefixIcon: Icon(Icons.search, color: Colors.white),
+                      hintStyle: const TextStyle(color: Colors.black54),
+                      prefixIcon: IconButton(
+                        onPressed: () => _performSearch(searchableProducts),
+                        icon: const Icon(Icons.search, color: Colors.black),
+                      ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(vertical: 10),
                     ),
@@ -120,13 +145,25 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: <Widget>[
           IconButton(
-            onPressed: _toggleSearch,
+            onPressed: _isSearchExpanded
+                ? _toggleSearch
+                : () {
+                    setState(() {
+                      _isSearchExpanded = true;
+                    });
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) {
+                        _searchFocusNode.requestFocus();
+                      }
+                    });
+                  },
             icon: Icon(_isSearchExpanded ? Icons.close : Icons.search),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_none_rounded),
-          ),
+          if (!_isSearchExpanded)
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.notifications_none_rounded),
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -135,70 +172,103 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             if (_suggestions.isNotEmpty) _buildSuggestionList(),
-            const SizedBox(height: 20),
-            _buildBannerCarousel(banners),
-            const SizedBox(height: 12),
-            _buildBannerIndicator(banners.length),
-            const SizedBox(height: 24),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text('Featured', style: AppTextStyle.heading),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 300,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                scrollDirection: Axis.horizontal,
-                itemCount: data.featuredProducts.length,
-                separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(width: 16);
-                },
-                itemBuilder: (BuildContext context, int index) {
-                  final ProductModel product = data.featuredProducts[index];
-                  return ProductCard(
-                    product: product,
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoute.productDetails,
-                        arguments: product,
-                      );
-                    },
-                  );
-                },
+            if (_searchedProducts.isNotEmpty) ...<Widget>[
+              const SizedBox(height: 20),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text('Search Result', style: AppTextStyle.heading),
               ),
-            ),
-            const SizedBox(height: 24),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text('Popular', style: AppTextStyle.heading),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 300,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                scrollDirection: Axis.horizontal,
-                itemCount: data.popularProducts.length,
-                separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(width: 16);
-                },
-                itemBuilder: (BuildContext context, int index) {
-                  final ProductModel product = data.popularProducts[index];
-                  return ProductCard(
-                    product: product,
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoute.productDetails,
-                        arguments: product,
-                      );
-                    },
-                  );
-                },
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 300,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _searchedProducts.length,
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(width: 16);
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    final ProductModel product = _searchedProducts[index];
+                    return ProductCard(
+                      product: product,
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoute.productDetails,
+                          arguments: product,
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
+            ] else ...<Widget>[
+              const SizedBox(height: 20),
+              _buildBannerCarousel(banners),
+              const SizedBox(height: 12),
+              _buildBannerIndicator(banners.length),
+              const SizedBox(height: 24),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text('Featured', style: AppTextStyle.heading),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 300,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: data.featuredProducts.length,
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(width: 16);
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    final ProductModel product = data.featuredProducts[index];
+                    return ProductCard(
+                      product: product,
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoute.productDetails,
+                          arguments: product,
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text('Popular', style: AppTextStyle.heading),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 300,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: data.popularProducts.length,
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(width: 16);
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    final ProductModel product = data.popularProducts[index];
+                    return ProductCard(
+                      product: product,
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoute.productDetails,
+                          arguments: product,
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -210,16 +280,20 @@ class _HomeScreenState extends State<HomeScreen> {
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: AppColor.primary.withValues(alpha: 0.95),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColor.border),
       ),
       child: Column(
         children: _suggestions.map((String item) {
           return ListTile(
             dense: true,
-            title: Text(item, style: const TextStyle(color: Colors.white)),
+            title: Text(item, style: const TextStyle(color: Colors.black)),
             onTap: () {
               _searchController.text = item;
+              _performSearch(
+                HomeModelData.fromController(_controller).searchableProducts,
+              );
               setState(() {
                 _suggestions = <String>[];
               });
@@ -334,18 +408,25 @@ class HomeModelData {
     required this.topProducts,
     required this.featuredProducts,
     required this.popularProducts,
+    required this.searchableProducts,
   });
 
   final List<ProductModel> topProducts;
   final List<ProductModel> featuredProducts;
   final List<ProductModel> popularProducts;
+  final List<ProductModel> searchableProducts;
 
   factory HomeModelData.fromController(HomeController controller) {
     final data = controller.dashboardData;
+    final List<ProductModel> searchableProducts = <ProductModel>[
+      ...data.featuredProducts,
+      ...data.trendingProducts,
+    ];
     return HomeModelData(
       topProducts: data.featuredProducts,
       featuredProducts: data.featuredProducts,
       popularProducts: data.trendingProducts,
+      searchableProducts: searchableProducts,
     );
   }
 }
