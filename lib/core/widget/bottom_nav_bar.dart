@@ -1,3 +1,4 @@
+import 'package:circle_nav_bar/circle_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:optizenqor/core/constant/app_color.dart';
 import 'package:optizenqor/feature/master/navigation/navigation_model/navigation_item_model.dart';
@@ -16,64 +17,41 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColor.primary,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: const <BoxShadow>[
-          BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 24,
-            offset: Offset(0, 10),
-          ),
-        ],
+    return CircleNavBar(
+      activeIndex: currentIndex,
+      color: AppColor.primary,
+      height: 60,
+      circleWidth: 60,
+      circleColor: Colors.white,
+      shadowColor: Colors.black,
+      elevation: 6,
+      padding: EdgeInsets.zero,
+      cornerRadius: const BorderRadius.only(
+        topLeft: Radius.circular(0),
+        topRight: Radius.circular(0),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: List<Widget>.generate(items.length, (int index) {
-          final NavigationItemModel item = items[index];
-          final bool isActive = currentIndex == index;
-
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => onTap(index),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOut,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: isActive ? Colors.white : Colors.transparent,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Icon(
-                      item.icon,
-                      size: 24,
-                      color: isActive ? AppColor.primary : Colors.white70,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      item.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: isActive ? AppColor.primary : Colors.white70,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+      activeIcons: items
+          .map(
+            (NavigationItemModel item) =>
+                Icon(item.icon, size: 30, color: AppColor.primary),
+          )
+          .toList(),
+      inactiveIcons: items
+          .map(
+            (NavigationItemModel item) => const IconTheme(
+              data: IconThemeData(size: 30, color: Colors.white),
+              child: SizedBox.shrink(),
             ),
-          );
-        }),
-      ),
+          )
+          .toList()
+          .asMap()
+          .entries
+          .map(
+            (MapEntry<int, Widget> entry) =>
+                Icon(items[entry.key].icon, size: 30, color: Colors.white),
+          )
+          .toList(),
+      onTap: onTap,
     );
   }
 }
