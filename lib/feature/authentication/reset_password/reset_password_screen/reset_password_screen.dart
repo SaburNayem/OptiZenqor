@@ -3,26 +3,27 @@ import 'package:optizenqor/app_route/app_route.dart';
 import 'package:optizenqor/core/constant/text_style.dart';
 import 'package:optizenqor/core/widget/button_widget.dart';
 import 'package:optizenqor/core/widget/text_field_widget.dart';
-import 'package:optizenqor/feature/authentication/sign_in/sign_in_controller/sign_in_controller.dart';
+import 'package:optizenqor/feature/authentication/reset_password/reset_password_controller/reset_password_controller.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class ResetPasswordScreen extends StatefulWidget {
+  const ResetPasswordScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final SignInController _controller = SignInController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final ResetPasswordController _controller = ResetPasswordController();
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -35,8 +36,7 @@ class _SignInScreenState extends State<SignInScreen> {
       _isLoading = true;
     });
 
-    final result = await _controller.signIn(
-      email: _emailController.text.trim(),
+    final result = await _controller.resetPassword(
       password: _passwordController.text.trim(),
     );
 
@@ -55,7 +55,7 @@ class _SignInScreenState extends State<SignInScreen> {
     if (result.success) {
       Navigator.pushNamedAndRemoveUntil(
         context,
-        AppRoute.mainShell,
+        AppRoute.signIn,
         (Route<dynamic> route) => false,
       );
     }
@@ -80,33 +80,14 @@ class _SignInScreenState extends State<SignInScreen> {
                 Text(content.subtitle, style: AppTextStyle.body),
                 const SizedBox(height: 28),
                 AppTextField(
-                  controller: _emailController,
-                  label: 'Email',
-                  hintText: 'example@gmail.com',
-                  keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icons.email_outlined,
-                  validator: (String? value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!RegExp(
-                      r'^[^@]+@[^@]+\.[^@]+',
-                    ).hasMatch(value.trim())) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                AppTextField(
                   controller: _passwordController,
-                  label: 'Password',
-                  hintText: 'Enter your password',
+                  label: 'New password',
+                  hintText: 'Enter new password',
                   obscureText: true,
                   prefixIcon: Icons.lock_outline,
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                      return 'Please enter a new password';
                     }
                     if (value.length < 6) {
                       return 'Password must be at least 6 characters';
@@ -114,27 +95,28 @@ class _SignInScreenState extends State<SignInScreen> {
                     return null;
                   },
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, AppRoute.forgotPassword);
-                    },
-                    child: const Text('Forget Password'),
-                  ),
+                const SizedBox(height: 16),
+                AppTextField(
+                  controller: _confirmPasswordController,
+                  label: 'Confirm password',
+                  hintText: 'Re-enter password',
+                  obscureText: true,
+                  prefixIcon: Icons.lock_reset_rounded,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please confirm your password';
+                    }
+                    if (value != _passwordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 24),
                 AppButton(
-                  title: 'Log In',
+                  title: content.buttonText,
                   onPressed: _submit,
                   isLoading: _isLoading,
-                ),
-                const SizedBox(height: 12),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRoute.signUp);
-                  },
-                  child: const Text('Need an account? Create one'),
                 ),
               ],
             ),
