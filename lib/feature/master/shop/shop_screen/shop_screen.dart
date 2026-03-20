@@ -21,6 +21,8 @@ class _ShopScreenState extends State<ShopScreen> {
   late List<ProductModel> _products;
   RangeValues _priceRange = const RangeValues(0, 50);
   double _minimumRating = 0;
+  String _sortBy = 'default';
+  String _selectedCategoryId = 'all';
 
   bool get _hasSearchQuery => _searchController.text.trim().isNotEmpty;
 
@@ -43,21 +45,372 @@ class _ShopScreenState extends State<ShopScreen> {
 
   void _search(String query) {
     setState(() {
-      _products = _applyFilters(_controller.searchProducts(query));
+      _products = _applySort(_applyFilters(_controller.searchProducts(query)));
+    });
+  }
+
+  void _clearSearch() {
+    setState(() {
+      _searchController.clear();
+      _products = _applySort(_applyFilters(_controller.data.products));
     });
   }
 
   List<ProductModel> _applyFilters(List<ProductModel> products) {
     return products.where((ProductModel product) {
-      return product.price >= _priceRange.start &&
+      final bool matchesCategory =
+          _selectedCategoryId == 'all' ||
+          product.categoryId == _selectedCategoryId;
+
+      return matchesCategory &&
+          product.price >= _priceRange.start &&
           product.price <= _priceRange.end &&
           product.rating >= _minimumRating;
     }).toList();
   }
 
-  Future<void> _openFilterSheet() async {
+  List<ProductModel> _applySort(List<ProductModel> products) {
+    final List<ProductModel> sorted = List<ProductModel>.from(products);
+
+    switch (_sortBy) {
+      case 'price_low_to_high':
+        sorted.sort(
+          (ProductModel a, ProductModel b) => a.price.compareTo(b.price),
+        );
+        break;
+      case 'price_high_to_low':
+        sorted.sort(
+          (ProductModel a, ProductModel b) => b.price.compareTo(a.price),
+        );
+        break;
+      case 'rating':
+        sorted.sort(
+          (ProductModel a, ProductModel b) => b.rating.compareTo(a.rating),
+        );
+        break;
+      case 'name':
+        sorted.sort(
+          (ProductModel a, ProductModel b) => a.name.compareTo(b.name),
+        );
+        break;
+      case 'default':
+      default:
+        break;
+    }
+
+    return sorted;
+  }
+
+  void _refreshProducts() {
+    setState(() {
+      _products = _applySort(
+        _applyFilters(
+          _controller.searchProducts(_searchController.text.trim()),
+        ),
+      );
+    });
+  }
+
+  Future<void> _openFilterPanel() async {
+    final List<MapEntry<String, String>> categoryOptions =
+        <MapEntry<String, String>>[
+          const MapEntry<String, String>('all', 'All Categories'),
+          ..._controller.data.categories.map(
+            (category) => MapEntry<String, String>(category.id, category.name),
+          ),
+          const MapEntry<String, String>('featured', 'Featured'),
+        ];
     RangeValues selectedPriceRange = _priceRange;
     double selectedRating = _minimumRating;
+    String selectedCategoryId = _selectedCategoryId;
+    final TextEditingController minimumPriceController = TextEditingController(
+      text: selectedPriceRange.start.round().toString(),
+    );
+    final TextEditingController maximumPriceController = TextEditingController(
+      text: selectedPriceRange.end.round().toString(),
+    );
+
+    await showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Filter',
+      barrierColor: Colors.black38,
+      pageBuilder:
+          (
+            BuildContext dialogContext,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) => const SizedBox.shrink(),
+      transitionBuilder:
+          (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) {
+            return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setModalState) {
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: SlideTransition(
+                    position:
+                        Tween<Offset>(
+                          begin: const Offset(-1, 0),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeOut,
+                          ),
+                        ),
+                    child: Material(
+                      color: Colors.white,
+                      child: SafeArea(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.84,
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    const Text(
+                                      'Filter Products',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      icon: const Icon(Icons.close),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Expanded(
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        const Text(
+                                          'Categories',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          children: categoryOptions.map((
+                                            MapEntry<String, String> category,
+                                          ) {
+                                            final bool isSelected =
+                                                selectedCategoryId ==
+                                                category.key;
+
+                                            return ChoiceChip(
+                                              label: Text(category.value),
+                                              selected: isSelected,
+                                              onSelected: (_) {
+                                                setModalState(() {
+                                                  selectedCategoryId =
+                                                      category.key;
+                                                });
+                                              },
+                                            );
+                                          }).toList(),
+                                        ),
+                                        const SizedBox(height: 18),
+                                        const Text(
+                                          'Price Range',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: TextField(
+                                                controller:
+                                                    minimumPriceController,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                decoration:
+                                                    const InputDecoration(
+                                                      labelText: 'Minimum',
+                                                      prefixText: '\$',
+                                                    ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: TextField(
+                                                controller:
+                                                    maximumPriceController,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                decoration:
+                                                    const InputDecoration(
+                                                      labelText: 'Maximum',
+                                                      prefixText: '\$',
+                                                    ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'Price Range: \$${selectedPriceRange.start.round()} - \$${selectedPriceRange.end.round()}',
+                                        ),
+                                        RangeSlider(
+                                          values: selectedPriceRange,
+                                          min: 0,
+                                          max: 50,
+                                          divisions: 10,
+                                          labels: RangeLabels(
+                                            '\$${selectedPriceRange.start.round()}',
+                                            '\$${selectedPriceRange.end.round()}',
+                                          ),
+                                          onChanged: (RangeValues values) {
+                                            setModalState(() {
+                                              selectedPriceRange = values;
+                                              minimumPriceController.text =
+                                                  values.start
+                                                      .round()
+                                                      .toString();
+                                              maximumPriceController.text =
+                                                  values.end.round().toString();
+                                            });
+                                          },
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'Minimum Rating: ${selectedRating.toStringAsFixed(1)}',
+                                        ),
+                                        const SizedBox(height: 10),
+                                        DropdownButtonFormField<double>(
+                                          initialValue: selectedRating,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Rating',
+                                          ),
+                                          items:
+                                              List<double>.generate(
+                                                11,
+                                                (int index) => index * 0.5,
+                                              ).map((double value) {
+                                                return DropdownMenuItem<double>(
+                                                  value: value,
+                                                  child: Text(
+                                                    value == 0
+                                                        ? 'All Ratings'
+                                                        : '${value.toStringAsFixed(1)} & up',
+                                                  ),
+                                                );
+                                              }).toList(),
+                                          onChanged: (double? value) {
+                                            if (value == null) {
+                                              return;
+                                            }
+                                            setModalState(() {
+                                              selectedRating = value;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: OutlinedButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _priceRange = const RangeValues(
+                                              0,
+                                              50,
+                                            );
+                                            _minimumRating = 0;
+                                            _selectedCategoryId = 'all';
+                                          });
+                                          _refreshProducts();
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Reset'),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: FilledButton(
+                                        onPressed: () {
+                                          final double? minimumPrice =
+                                              double.tryParse(
+                                                minimumPriceController.text
+                                                    .trim(),
+                                              );
+                                          final double? maximumPrice =
+                                              double.tryParse(
+                                                maximumPriceController.text
+                                                    .trim(),
+                                              );
+                                          final double resolvedMinimumPrice =
+                                              (minimumPrice ?? 0).clamp(0, 50);
+                                          final double resolvedMaximumPrice =
+                                              (maximumPrice ?? 50).clamp(0, 50);
+                                          final double startPrice =
+                                              resolvedMinimumPrice <=
+                                                  resolvedMaximumPrice
+                                              ? resolvedMinimumPrice
+                                              : resolvedMaximumPrice;
+                                          final double endPrice =
+                                              resolvedMaximumPrice >=
+                                                  resolvedMinimumPrice
+                                              ? resolvedMaximumPrice
+                                              : resolvedMinimumPrice;
+
+                                          setState(() {
+                                            _priceRange = RangeValues(
+                                              startPrice,
+                                              endPrice,
+                                            );
+                                            _minimumRating = selectedRating;
+                                            _selectedCategoryId =
+                                                selectedCategoryId;
+                                          });
+                                          _refreshProducts();
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Apply'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+    );
+  }
+
+  Future<void> _openSortSheet() async {
+    String selectedSortBy = _sortBy;
 
     await showModalBottomSheet<void>(
       context: context,
@@ -76,81 +429,57 @@ class _ShopScreenState extends State<ShopScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   const Text(
-                    'Filter Products',
+                    'Sort By',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Price Range: \$${selectedPriceRange.start.round()} - \$${selectedPriceRange.end.round()}',
-                  ),
-                  RangeSlider(
-                    values: selectedPriceRange,
-                    min: 0,
-                    max: 50,
-                    divisions: 10,
-                    labels: RangeLabels(
-                      '\$${selectedPriceRange.start.round()}',
-                      '\$${selectedPriceRange.end.round()}',
-                    ),
-                    onChanged: (RangeValues values) {
-                      setModalState(() {
-                        selectedPriceRange = values;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  Text('Minimum Rating: ${selectedRating.toStringAsFixed(1)}'),
-                  Slider(
-                    value: selectedRating,
-                    min: 0,
-                    max: 5,
-                    divisions: 5,
-                    label: selectedRating.toStringAsFixed(1),
-                    onChanged: (double value) {
-                      setModalState(() {
-                        selectedRating = value;
-                      });
-                    },
-                  ),
                   const SizedBox(height: 16),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            setState(() {
-                              _priceRange = const RangeValues(0, 50);
-                              _minimumRating = 0;
-                              _products = _applyFilters(
-                                _controller.searchProducts(
-                                  _searchController.text.trim(),
-                                ),
-                              );
-                            });
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Reset'),
-                        ),
+                  ...<Map<String, String>>[
+                    <String, String>{'label': 'Default', 'value': 'default'},
+                    <String, String>{
+                      'label': 'Price: Low to High',
+                      'value': 'price_low_to_high',
+                    },
+                    <String, String>{
+                      'label': 'Price: High to Low',
+                      'value': 'price_high_to_low',
+                    },
+                    <String, String>{'label': 'Ranking', 'value': 'rating'},
+                    <String, String>{'label': 'Name', 'value': 'name'},
+                  ].map((Map<String, String> option) {
+                    final bool isSelected = selectedSortBy == option['value']!;
+
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        option['label']!,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: FilledButton(
-                          onPressed: () {
-                            setState(() {
-                              _priceRange = selectedPriceRange;
-                              _minimumRating = selectedRating;
-                              _products = _applyFilters(
-                                _controller.searchProducts(
-                                  _searchController.text.trim(),
-                                ),
-                              );
-                            });
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Apply'),
-                        ),
-                      ),
-                    ],
+                      trailing: isSelected
+                          ? const Icon(
+                              Icons.check_circle,
+                              color: Color(0xFF0F9D9A),
+                            )
+                          : const Icon(
+                              Icons.circle_outlined,
+                              color: Color(0xFFB8C4CC),
+                            ),
+                      onTap: () {
+                        setModalState(() {
+                          selectedSortBy = option['value']!;
+                        });
+                      },
+                    );
+                  }),
+                  const SizedBox(height: 10),
+                  FilledButton(
+                    onPressed: () {
+                      setState(() {
+                        _sortBy = selectedSortBy;
+                      });
+                      _refreshProducts();
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Apply'),
                   ),
                 ],
               ),
@@ -168,37 +497,6 @@ class _ShopScreenState extends State<ShopScreen> {
       appBar: AppCustomAppBar(
         title: 'Shop',
         actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(999),
-              onTap: _openFilterSheet,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF4F7F8),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: const Color(0xFFE3E8EB)),
-                ),
-                child: const Row(
-                  children: <Widget>[
-                    Icon(Icons.tune_rounded, size: 18),
-                    SizedBox(width: 6),
-                    Text(
-                      'Filter',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
           Builder(
             builder: (BuildContext context) {
               return Padding(
@@ -251,10 +549,76 @@ class _ShopScreenState extends State<ShopScreen> {
             TextField(
               controller: _searchController,
               onChanged: _search,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Search products...',
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _hasSearchQuery
+                    ? IconButton(
+                        onPressed: _clearSearch,
+                        icon: const Icon(Icons.close),
+                      )
+                    : null,
               ),
+            ),
+            const SizedBox(height: 18),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: _openFilterPanel,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5FAFA),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE3E8EB)),
+                      ),
+                      child: const Row(
+                        children: <Widget>[
+                          Icon(Icons.tune_rounded, size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            'Filter',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: _openSortSheet,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5FAFA),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE3E8EB)),
+                      ),
+                      child: const Row(
+                        children: <Widget>[
+                          Icon(Icons.swap_vert_rounded, size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            'Sort By',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 18),
             GridView.builder(
@@ -265,7 +629,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 14,
                 mainAxisSpacing: 14,
-                childAspectRatio: 0.68,
+                childAspectRatio: 0.62,
               ),
               itemBuilder: (BuildContext context, int index) {
                 final ProductModel product = _products[index];
