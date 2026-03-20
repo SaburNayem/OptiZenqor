@@ -1,16 +1,31 @@
-# optizenqor
+# OptiZenqor
 
-A new Flutter project.
+OptiZenqor is a Flutter productivity dashboard focused on energy-aware planning,
+habit consistency, and deep-work visibility.
+
+## Features
+
+- A polished home dashboard with goal, habit, and schedule sections
+- Responsive layout for mobile, tablet, and web
+- Clean starter structure for building a personal optimization app
+- Widget test coverage for the main dashboard experience
+
+## Project Structure
+
+- `lib/` application UI and hardcoded starter data
+- `test/` widget tests for key dashboard content
+- `android/`, `ios/`, `web/` platform runners and metadata
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+1. Install Flutter.
+2. Run `flutter pub get`.
+3. Start the app with `flutter run`.
 
-A few resources to get you started if this is your first Flutter project:
+## Test
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Run:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter test
+```
