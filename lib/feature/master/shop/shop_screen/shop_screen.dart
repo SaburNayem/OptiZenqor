@@ -7,7 +7,9 @@ import 'package:optizenqor/feature/master/product_details/product_details_model/
 import 'package:optizenqor/feature/master/shop/shop_controller/shop_controller.dart';
 
 class ShopScreen extends StatefulWidget {
-  const ShopScreen({super.key});
+  const ShopScreen({this.initialQuery, super.key});
+
+  final String? initialQuery;
 
   @override
   State<ShopScreen> createState() => _ShopScreenState();
@@ -24,6 +26,11 @@ class _ShopScreenState extends State<ShopScreen> {
   void initState() {
     super.initState();
     _products = _controller.data.products;
+
+    if (widget.initialQuery != null && widget.initialQuery!.trim().isNotEmpty) {
+      _searchController.text = widget.initialQuery!;
+      _products = _controller.searchProducts(widget.initialQuery!);
+    }
   }
 
   @override

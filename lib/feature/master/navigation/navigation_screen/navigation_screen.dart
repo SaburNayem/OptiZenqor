@@ -3,9 +3,14 @@ import 'package:optizenqor/core/widget/bottom_nav_bar.dart';
 import 'package:optizenqor/feature/master/navigation/navigation_controller/navigation_controller.dart';
 
 class NavigationScreen extends StatefulWidget {
-  const NavigationScreen({this.initialIndex = 0, super.key});
+  const NavigationScreen({
+    this.initialIndex = 0,
+    this.initialShopQuery,
+    super.key,
+  });
 
   final int initialIndex;
+  final String? initialShopQuery;
 
   @override
   State<NavigationScreen> createState() => _NavigationScreenState();
@@ -31,7 +36,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final pages = _controller.pages;
+    final pages = _controller.pages(initialShopQuery: widget.initialShopQuery);
     final items = _controller.items;
 
     return Scaffold(

@@ -59,22 +59,25 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _performSearch(List<ProductModel> products) {
+  void _performSearch() {
     final String query = _searchController.text.trim().toLowerCase();
 
-    setState(() {
-      _suggestions = <String>[];
-      if (query.isEmpty) {
+    if (query.isEmpty) {
+      setState(() {
+        _suggestions = <String>[];
         _searchedProducts = <ProductModel>[];
-        return;
-      }
+      });
+      return;
+    }
 
-      _searchedProducts = products.where((ProductModel product) {
-        return product.name.toLowerCase().contains(query) ||
-            product.categoryName.toLowerCase().contains(query) ||
-            product.description.toLowerCase().contains(query);
-      }).toList();
-    });
+    Navigator.pushReplacementNamed(
+      context,
+      AppRoute.mainShell,
+      arguments: <String, dynamic>{
+        'initialIndex': 1,
+        'searchQuery': _searchController.text.trim(),
+      },
+    );
   }
 
   void _toggleSearch() {
@@ -101,7 +104,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final HomeModelData data = HomeModelData.fromController(_controller);
     final List<ProductModel> banners = data.topProducts.take(3).toList();
-    final List<ProductModel> searchableProducts = data.searchableProducts;
 
     return Scaffold(
       backgroundColor: AppColor.background,
@@ -124,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   controller: _searchController,
                   focusNode: _searchFocusNode,
                   onChanged: _onSearchChanged,
-                  onSubmitted: (_) => _performSearch(searchableProducts),
+                  onSubmitted: (_) => _performSearch(),
                   style: const TextStyle(color: Colors.black, fontSize: 14),
                   decoration: InputDecoration(
                     hintText: 'Search products',
@@ -133,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontSize: 14,
                     ),
                     prefixIcon: IconButton(
-                      onPressed: () => _performSearch(searchableProducts),
+                      onPressed: _performSearch,
                       icon: const Icon(Icons.search, color: Colors.black),
                     ),
                     suffixIcon: IconButton(
@@ -329,9 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           onTap: () {
             _searchController.text = item;
-            _performSearch(
-              HomeModelData.fromController(_controller).searchableProducts,
-            );
+            _performSearch();
           },
         );
       },
